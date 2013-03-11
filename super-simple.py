@@ -5,7 +5,6 @@ from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form, TextField
 import uuid
 
-# create our little application :)
 app = Flask(__name__)
 Bootstrap(app)
 
