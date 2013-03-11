@@ -1,0 +1,5 @@
+# pip install -r requirements.txt
+# AM: I've not tested this file yet!
+Flask
+Flask-Bootstrap
+Flask-WTF
