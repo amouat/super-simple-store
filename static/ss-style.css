@@ -1,0 +1,16 @@
+#drop_zone {
+  border: 2px dashed #bbb;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  padding: 150px;
+  text-align: center;
+  color: #bbb;
+}
+
+
+.in {
+  float: left;
+  padding: 20px;
+}
+

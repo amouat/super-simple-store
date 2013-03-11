@@ -1,0 +1,88 @@
+{% extends "ss-base.html" %}
+
+{% block body_content %}
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">SuperSimpleStore</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li class="active"><a href="deposit">Deposit</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <form method="post" action="upload">
+        <input type="hidden" id="fileselec" name="files" value="">
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="hero-unit">
+        <h1>Deposit</h1>
+
+        <p/>
+        <div id="drop_zone"><h2>Drop files here</h2></div>
+        <output id="list"></output>
+
+        <script>
+          function handleFileSelect(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+
+            var files = evt.dataTransfer.files; // FileList object.
+
+            // files is a FileList of File objects. List some properties.
+            var output = [];
+            for (var i = 0, f; f = files[i]; i++) {
+              output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+              f.size, ' bytes, last modified: ',
+              f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+              '</li>');
+            }
+            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+            document.getElementById('fileselec').value = JSON.stringify(files);
+          }
+
+          function handleDragOver(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+          }
+
+          // Setup the dnd listeners.
+          var dropZone = document.getElementById('drop_zone');
+          dropZone.addEventListener('dragover', handleDragOver, false);
+          dropZone.addEventListener('drop', handleFileSelect, false);
+        </script>
+      </div>
+      <div class="domains" width="100%">
+
+
+        <h2>Select a domain</h2>
+          <div class="in">
+            <input type="radio" name="domain" id="other" value="other" checked="checked"/>
+            <label for="other"><img src="static/question.png" width="100px" height="100px" alt="Other domain" /><br/>Other</label>
+          </div>
+
+          <div class="in">
+            <input type="radio" name="domain" value="biology" id="biology" />
+            <label for="biology"><img src="static/microscope.png" width="100px" height="100px" alt="Biology domain" /><br/>Biology</label>
+          </div>
+
+          <div class="in">
+            <input type="radio" name="domain" value="chemistry" id="chemistry" />
+            <label for="chemistry"><img src="static/test-tube.png" width="100px" height="100px" alt="Chemistry domain" /><br/>Chemistry</label>
+          </div>
+          <input class="btn btn-primary btn-large pull-right" type="submit"/>
+
+      </div>
+        </form>
+      </div>
+      {% endblock %}

@@ -1,0 +1,9 @@
+*~
+tags
+.settings
+.pydevproject
+.project
+.ropeproject
+*.egg-info
+venv/
+*.swp

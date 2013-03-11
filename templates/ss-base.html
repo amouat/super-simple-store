@@ -1,0 +1,15 @@
+{% extends "bootstrap_responsive.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
+{% block style %}
+  {{ super() }}
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='ss-style.css') }}">
+
+{% endblock %}
+{# I assuming including a template like this to essentially rename it is ok #}
+{% block bootstrap_js_bottom %}
+  {{ super() }}
+  {% block scripts %}
+
+  {% endblock %}
+{% endblock %}
+
