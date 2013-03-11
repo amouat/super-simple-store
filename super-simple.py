@@ -8,7 +8,8 @@ import uuid
 app = Flask(__name__)
 Bootstrap(app)
 
-app.config.from_object(__name__)
+#app.config.from_object(__name__)
+app.config['BOOTSTRAP_FONTAWESOME'] = True
 
 
 @app.route('/')
