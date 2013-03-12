@@ -8,3 +8,4 @@ tags
 venv/
 sss/uploads/
 *.swp
+*.pyc
