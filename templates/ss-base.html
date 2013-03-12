@@ -5,7 +5,6 @@
   <link rel=stylesheet type=text/css href="{{ url_for('static', filename='ss-style.css') }}">
 
 {% endblock %}
-{# I assuming including a template like this to essentially rename it is ok #}
 {% block body_content %}
 
   {% set nav_bar_items = [
@@ -38,6 +37,7 @@
 
 {% endblock %}
 
+{# Really just want to rename block, assume this the way... #}
 {% block bootstrap_js_bottom %}
   {{ super() }}
   {% block scripts %}

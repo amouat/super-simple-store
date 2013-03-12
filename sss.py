@@ -15,6 +15,7 @@ Bootstrap(app)
 
 #app.config.from_object(__name__)
 app.config['BOOTSTRAP_FONTAWESOME'] = True
+app.config['SECRET_KEY'] = 'wtfkey'
 
 
 @app.route('/')
