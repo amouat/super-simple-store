@@ -14,13 +14,21 @@ from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form, TextField
 from flask.ext.wtf.html5 import EmailField
 
-app = Flask(__name__)
-Bootstrap(app)
+from ext import db
+from model import Submission
 
-#app.config.from_object(__name__)
+app = Flask(__name__)
+app.config.from_object('config')
+try:
+    app.config.from_envvar('SSS_CONFIG_PATH')
+except RuntimeError:
+    pass
+
 app.config['BOOTSTRAP_FONTAWESOME'] = True
 app.config['SECRET_KEY'] = 'wtfkey'
 app.config['UPLOAD_FOLDER'] = 'uploads'
+
+Bootstrap(app)
 
 
 @app.route('/')
@@ -126,6 +134,10 @@ def deposit():
     return render_template('deposit.html')
 
 
+def init_app():
+    db.init_app(app)
+    db.app = app
+
 if __name__ == '__main__':
     from optparse import OptionParser
     parser = OptionParser()
@@ -139,4 +151,5 @@ if __name__ == '__main__':
         app.config['DEBUG'] = True
         app.logger.setLevel(logging.ERROR)
 
-    app.run(host='0.0.0.0')
+    init_app()
+    app.run(host=app.config['INTERFACE'], port=app.config['PORT'])
