@@ -1,9 +1,14 @@
-# all the imports
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from __future__ import with_statement
+import uuid
+import logging
+
 from flask import Flask, request, render_template
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form, TextField
-import uuid
+
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -44,4 +49,16 @@ def deposit():
 
 
 if __name__ == '__main__':
+    from optparse import OptionParser
+    parser = OptionParser()
+    parser.add_option('-d', '--debug', dest='debug',
+                      help='Run app in debug mode', action='store_true', default=False)
+
+    (options, args) = parser.parse_args()
+
+    if options.debug:
+        print ' * Setting debug mode'
+        app.config['DEBUG'] = True
+        app.logger.setLevel(logging.ERROR)
+
     app.run(host='0.0.0.0')
