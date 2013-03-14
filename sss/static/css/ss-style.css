@@ -1,0 +1,158 @@
+#drop_zone {
+  border: 2px dashed #bbb;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  padding: 150px;
+  text-align: center;
+  background-color: #eee;
+}
+
+
+.in {
+  float: left;
+  padding: 20px;
+  text-align: center;
+  width: 90px;
+}
+
+.in:hover {
+  opacity: 0.8;
+  color: #9d261d;
+}
+
+/* Hide only visually, but have it available for screenreaders: h5bp.com/v */
+.visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
+
+/* Extends the .visuallyhidden class to allow the element to be focusable when navigated to via the keyboard: h5bp.com/p */
+.visuallyhidden.focusable:active, .visuallyhidden.focusable:focus { clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto; }
+
+.highlight-icon {
+  color: #9d261d;
+}
+
+.deposit {
+
+  margin: 60px 0;
+
+}
+
+/* File upload stuff from jasny */
+.btn-file {
+  position: relative;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.btn-file > input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  font-size: 23px;
+  cursor: pointer;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  transform: translate(-300px, 0) scale(4);
+  direction: ltr;
+}
+
+.fileupload {
+  margin-bottom: 9px;
+}
+
+.fileupload .uneditable-input {
+  display: inline-block;
+  margin-bottom: 0;
+  vertical-align: middle;
+  cursor: text;
+}
+
+.fileupload .thumbnail {
+  display: inline-block;
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.fileupload .thumbnail > img {
+  display: inline-block;
+  max-height: 100%;
+  vertical-align: middle;
+}
+
+.fileupload .btn {
+  vertical-align: middle;
+}
+
+.fileupload-exists .fileupload-new,
+.fileupload-new .fileupload-exists {
+  display: none;
+}
+
+.fileupload-inline .fileupload-controls {
+  display: inline;
+}
+
+.fileupload-new .input-append .btn-file {
+  -webkit-border-radius: 0 3px 3px 0;
+     -moz-border-radius: 0 3px 3px 0;
+          border-radius: 0 3px 3px 0;
+}
+
+.thumbnail-borderless .thumbnail {
+  padding: 0;
+  border: none;
+  -webkit-border-radius: 0;
+     -moz-border-radius: 0;
+          border-radius: 0;
+  -webkit-box-shadow: none;
+     -moz-box-shadow: none;
+          box-shadow: none;
+}
+
+.fileupload-new.thumbnail-borderless .thumbnail {
+  border: 1px solid #ddd;
+}
+
+.control-group.warning .fileupload .uneditable-input {
+  color: #a47e3c;
+  border-color: #a47e3c;
+}
+
+.control-group.warning .fileupload .fileupload-preview {
+  color: #a47e3c;
+}
+
+.control-group.warning .fileupload .thumbnail {
+  border-color: #a47e3c;
+}
+
+.control-group.error .fileupload .uneditable-input {
+  color: #b94a48;
+  border-color: #b94a48;
+}
+
+.control-group.error .fileupload .fileupload-preview {
+  color: #b94a48;
+}
+
+.control-group.error .fileupload .thumbnail {
+  border-color: #b94a48;
+}
+
+.control-group.success .fileupload .uneditable-input {
+  color: #468847;
+  border-color: #468847;
+}
+
+.control-group.success .fileupload .fileupload-preview {
+  color: #468847;
+}
+
+.control-group.success .fileupload .thumbnail {
+  border-color: #468847;
+}
+
+
