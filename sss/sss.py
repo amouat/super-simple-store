@@ -5,10 +5,10 @@ from __future__ import with_statement
 import uuid
 import logging
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, flash
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form, TextField
-
+from flaskext.uploads import UploadSet, ALL, configure_uploads
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -16,6 +16,14 @@ Bootstrap(app)
 #app.config.from_object(__name__)
 app.config['BOOTSTRAP_FONTAWESOME'] = True
 app.config['SECRET_KEY'] = 'wtfkey'
+
+
+#I think the idea is you can serve multiple apps from one config
+def upload_dir(app):
+    return "uploads"
+
+fileset = UploadSet('files', ALL, upload_dir)
+configure_uploads(app, fileset)
 
 
 @app.route('/')
@@ -28,15 +36,11 @@ class OtherForm(Form):
     title = TextField('Title')
 
 
-@app.route('/upload', methods=['POST'])
-def upload():
-    form = OtherForm()
-    print 'files' + request.form['files']
-    return render_template(
-        'upload.html',
-        domain=request.form['domain'],
-        fileret=request.form['files'],
-        form=form)
+@app.route('/file_upload', methods=['POST'])
+def file_upload():
+    filename = fileset.save(request.files['files'])
+    flash("saved?")
+    return render_template('deposit.html')
 
 
 @app.route('/finalise', methods=['POST'])
