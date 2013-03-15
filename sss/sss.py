@@ -5,7 +5,7 @@ from __future__ import with_statement
 import uuid
 import logging
 
-from flask import Flask, request, render_template, flash
+from flask import Flask, request, render_template
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form, TextField
 from flaskext.uploads import UploadSet, ALL, configure_uploads
@@ -38,8 +38,10 @@ class OtherForm(Form):
 
 @app.route('/file_upload', methods=['POST'])
 def file_upload():
-    filename = fileset.save(request.files['files'])
-    flash("saved?")
+    for f in request.files.getlist('files'):
+        filename = fileset.save(f)
+        print "saved " + filename
+
     return render_template('deposit.html')
 
 
