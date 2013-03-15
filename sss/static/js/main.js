@@ -32,10 +32,10 @@ $(function () {
         )
     );
 
-    if (window.location.hostname === 'inv:5000') {
+    if (window.location.hostname === 'blueimp.github.com') {
         // Demo settings:
         $('#fileupload').fileupload('option', {
-            url: '/jqupload',
+            url: '//jquery-file-upload.appspot.com/',
             maxFileSize: 5000000,
             acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
             process: [
@@ -57,7 +57,7 @@ $(function () {
         // Upload server status check for browsers with CORS support:
         if ($.support.cors) {
             $.ajax({
-                url: '/jqupload',
+                url: '//jquery-file-upload.appspot.com/',
                 type: 'HEAD'
             }).fail(function () {
                 $('<span class="alert alert-error"/>')
@@ -79,5 +79,20 @@ $(function () {
                 .call(this, null, {result: result});
         });
     }
+
+    // Initialize the Image Gallery widget:
+    //$('#fileupload .files').imagegallery();
+
+    // Initialize the theme switcher:
+    $('#theme-switcher').change(function () {
+        var theme = $('#theme');
+        theme.prop(
+            'href',
+            theme.prop('href').replace(
+                /[\w\-]+\/jquery-ui.css/,
+                $(this).val() + '/jquery-ui.css'
+            )
+        );
+    });
 
 });

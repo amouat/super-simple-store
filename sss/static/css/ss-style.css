@@ -8,15 +8,14 @@
   background-color: #eee;
 }
 
-
-.in {
+.domain {
   float: left;
   padding: 20px;
   text-align: center;
   width: 90px;
 }
 
-.in:hover {
+.domain:hover {
   opacity: 0.8;
   color: #9d261d;
 }

@@ -44,11 +44,6 @@ def jqupload():
 
     if request.method == 'POST':
 
-        #The code correctly gets the file and saves it
-        #A response is sent, but something seems to fail on the JS side
-        #Note delete URLs and file URLs are given, but not implemented currently
-        #AFAICT the client never used them
-        #
         #You can't use the data_file.content_length method as it is 0 usually
         #Note that I've hard coded the server name, obviously you will need
         #to fix this

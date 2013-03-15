@@ -8,6 +8,13 @@
   <!-- CSS adjustments for browsers with JavaScript disabled -->
   <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fileupload-ui-noscript.css') }}"></noscript>
   <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <!-- Generic page styles -->
+  <!-- Bootstrap styles for responsive website layout, supporting different screen sizes -->
+  <link rel="stylesheet" href="http://blueimp.github.com/cdn/css/bootstrap-responsive.min.css">
+  <!-- Bootstrap CSS fixes for IE6 -->
+  <!--[if lt IE 7]><link rel="stylesheet" href="http://blueimp.github.com/cdn/css/bootstrap-ie6.min.css"><![endif]-->
+  <!-- Bootstrap Image Gallery styles -->
+  <link rel="stylesheet" href="http://blueimp.github.com/Bootstrap-Image-Gallery/css/bootstrap-image-gallery.min.css">
 {% endblock %}
 
 {% block body_content %}
@@ -16,32 +23,35 @@
 
     <div class="container">
 
+
+
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="deposit">
+        <h1>Deposit</h1>
+
+        <p/>
+        <div id="drop_zone">
+          <h2>Drag and drop files here</h2>
+          <!--<h2>or <span class="btn btn-file">Upload<input type="file" /></span></h2>-->
+          <!--<div class="fileupload fileupload-new" data-provides="fileupload">
+            <span class="btn btn-file"><span class="fileupload-new">Select file</span><span class="fileupload-exists">Change</span><input type="file" name="file"/></span>
+            <span class="fileupload-preview"></span>
+            <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none">×</a>
+          </div>-->
+        </h2>
    <!-- The file upload form used as target for the file upload widget -->
     <form id="fileupload" action="jqupload" method="POST" enctype="multipart/form-data">
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         <noscript>JavaScript is required to upload files.</noscript>
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
         <div class="row fileupload-buttonbar">
-            <div class="span7">
+            <div >
                 <!-- The fileinput-button span is used to style the file input field as button -->
                 <span class="btn btn-success fileinput-button">
                     <i class="icon-plus icon-white"></i>
                     <span>Add files...</span>
                     <input type="file" name="files[]" multiple>
                 </span>
-                <button type="submit" class="btn btn-primary start">
-                    <i class="icon-upload icon-white"></i>
-                    <span>Start upload</span>
-                </button>
-                <button type="reset" class="btn btn-warning cancel">
-                    <i class="icon-ban-circle icon-white"></i>
-                    <span>Cancel upload</span>
-                </button>
-                <button type="button" class="btn btn-danger delete">
-                    <i class="icon-trash icon-white"></i>
-                    <span>Delete</span>
-                </button>
-                <input type="checkbox" class="toggle">
             </div>
             <!-- The global progress information -->
             <div class="span5 fileupload-progress fade">
@@ -57,65 +67,17 @@
         <div class="fileupload-loading"></div>
         <br>
         <!-- The table listing the files available for upload/download -->
-        <table role="presentation" class="table table-striped"><tbody class="files" data-toggle="modal-gallery" data-target="#modal-gallery"></tbody></table>
+        <table role="presentation" class="table table-striped"><tbody class="files"></tbody></table>
     </form>
-
-
-      <form method="post" action="upload" enctype="multipart/form-data">
-        <input type="hidden" id="fileselec" name="files" value="">
-      <!-- Main hero unit for a primary marketing message or call to action -->
-      <div class="deposit">
-        <h1>Deposit</h1>
-
-        <p/>
-        <div id="drop_zone">
-          <h2>Drag and drop files here</h2>
-          <!--<h2>or <span class="btn btn-file">Upload<input type="file" /></span></h2>-->
-          <!--<div class="fileupload fileupload-new" data-provides="fileupload">
-            <span class="btn btn-file"><span class="fileupload-new">Select file</span><span class="fileupload-exists">Change</span><input type="file" name="file"/></span>
-            <span class="fileupload-preview"></span>
-            <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none">×</a>
-          </div>-->
-          <input type="file" name="file"/>
-        </h2>
         </div>
         <output id="list"></output>
 
-        <script>
-          function handleFileSelect(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-
-            var files = evt.dataTransfer.files; // FileList object.
-
-            // files is a FileList of File objects. List some properties.
-            var output = [];
-            for (var i = 0, f; f = files[i]; i++) {
-              output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-              f.size, ' bytes, last modified: ',
-              f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-              '</li>');
-            }
-            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-            document.getElementById('fileselec').value = JSON.stringify(files);
-          }
-
-          function handleDragOver(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-            evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-          }
-
-          // Setup the dnd listeners.
-          var dropZone = document.getElementById('drop_zone');
-          dropZone.addEventListener('dragover', handleDragOver, false);
-          dropZone.addEventListener('drop', handleFileSelect, false);
-        </script>
       </div>
-      <div class="domains" id="domains" width="100%">
+      <form method="post" action="domains" enctype="multipart/form-data">
+        <div class="domains" id="domains" width="100%">
 
 
-        <h2>Select a domain</h2>
+          <h2>Select a domain</h2>
 
         <!-- id/value, text, icon -->
   {% set domain_entries = [
@@ -132,7 +94,7 @@
 
 
   {% for id, text, icon in domain_entries %}
-  <div class="in {% if id == default_domain %} highlight-icon{% endif %}">
+  <div class="domain {% if id == default_domain %} highlight-icon{% endif %}">
     <input type="radio" class="visuallyhidden" name="domain" id="{{ id }}" value="{{ id }}" 
     {% if id == default_domain %}checked="checked"{% endif %}/>
     <label for="{{ id }}">
@@ -150,17 +112,17 @@
 {% endblock %}
 {% block scripts %}
 {{ super() }}
-
   <script>
     $('#domains input:radio').addClass('visuallyhidden');
-    $('#domains .in').click(function() {
+    $('#domains .domain').click(function() {
       $(this).addClass('highlight-icon').siblings().removeClass('highlight-icon');
       });
   </script>
 {% raw %}
+<!-- The template to display files available for upload -->
 <script id="template-upload" type="text/x-tmpl">
 {% for (var i=0, file; file=o.files[i]; i++) { %}
-    <tr class="template-upload fade">
+    <tr class="template-upload fade amtest">
         <td class="preview"><span class="fade"></span></td>
         <td class="name"><span>{%=file.name%}</span></td>
         <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
@@ -187,9 +149,46 @@
         {% } %}</td>
     </tr>
 {% } %}
+</script>
+<!-- The template to display files available for download -->
+<script id="template-download" type="text/x-tmpl">
+{% for (var i=0, file; file=o.files[i]; i++) { %}
+    <tr class="template-download fade">
+        {% if (file.error) { %}
+            <td></td>
+            <td class="name"><span>{%=file.name%}</span></td>
+            <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+            <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+        {% } else { %}
+            <td class="preview">{% if (file.thumbnail_url) { %}
+                <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="gallery" download="{%=file.name%}"><img src="{%=file.thumbnail_url%}"></a>
+            {% } %}</td>
+            <td class="name">
+                <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">{%=file.name%}</a>
+            </td>
+            <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+            <td colspan="2"></td>
+        {% } %}
+        <td>
+            <button class="btn btn-danger delete" data-type="{%=file.delete_type%}" data-url="{%=file.delete_url%}"{% if (file.delete_with_credentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
+                <i class="icon-trash icon-white"></i>
+                <span>Delete</span>
+            </button>
+            <input type="checkbox" name="delete" value="1" class="toggle">
+        </td>
+    </tr>
+{% } %}
 {% endraw %}
 </script>
-<script src="{{ url_for('static', filename='js/vendor/jquery.ui.widget.js') }}"></script>
+<!--<script src="{{ url_for('static', filename='js/vendor/jquery.ui.widget.js') }}"></script>-->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="static/js/vendor/jquery.ui.widget.js"></script>
+<script src="http://blueimp.github.com/JavaScript-Templates/tmpl.min.js"></script>
+<!-- The Load Image plugin is included for the preview images and image resizing functionality -->
+<script src="http://blueimp.github.com/JavaScript-Load-Image/load-image.min.js"></script>
+<!-- The Canvas to Blob plugin is included for image resizing functionality -->
+<script src="http://blueimp.github.com/JavaScript-Canvas-to-Blob/canvas-to-blob.min.js"></script>
+<!-- Bootstrap JS and Bootstrap Image Gallery are not required, but included for the demo -->
 <script src="{{ url_for('static', filename='js/jquery.iframe-transport.js') }}"></script>
 <!-- The basic File Upload plugin -->
 <script src="{{ url_for('static', filename='js/jquery.fileupload.js') }}"></script>
