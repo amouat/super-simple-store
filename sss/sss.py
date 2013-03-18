@@ -5,11 +5,13 @@ from __future__ import with_statement
 import uuid
 import logging
 import os
+import urllib2
 
-from flask import Flask, request, render_template, jsonify
+from flask import (Flask, request, render_template, jsonify, flash,
+                   send_from_directory, url_for)
+from werkzeug import secure_filename
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form, TextField
-
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -30,16 +32,26 @@ class OtherForm(Form):
     title = TextField('Title')
 
 
-@app.route('/uptest', methods=['GET'])
-def uptest():
-    return render_template('uptest.html')
+@app.route('/addmeta', methods=['POST'])
+def addmeta():
+    print 'here'
+    form = OtherForm()
+    print 'here2'
+
+    return render_template(
+        'addmeta.html',
+        #domain=request.form['domain'],
+        domain='Other',
+        fileret='{}',
+        #fileret=request.form['files'],
+        form=form)
 
 
-@app.route('/jqupload', methods=['GET', 'POST'])
-def jqupload():
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
     if request.method == 'GET':
 
-        #Probably not correct, but trying to mimic requests on working code
+        #Possibly not correct, but trying to mimic requests on working code
         return ""
 
     if request.method == 'POST':
@@ -49,41 +61,49 @@ def jqupload():
         #to fix this
 
         data_file = request.files['files[]']
-        file_name = os.path.join(app.config['UPLOAD_FOLDER'], str(uuid.uuid4()))
+        dir_id = str(uuid.uuid4())
+        temp_dir_name = str(app.config['UPLOAD_FOLDER']) + "/" + dir_id
+        try:
+            os.makedirs(temp_dir_name)
+        except OSError as ex:
+            flash("Caught Server Error: " + ex.strerror)
+
+        sec_file = secure_filename(data_file.filename)
+        file_name = os.path.join(temp_dir_name, sec_file)
         data_file.save(file_name)
 
-        import urllib
-        del_url = "http://inv:5000" + request.path + "?" + urllib.urlencode(
-            {"f":  os.path.split(file_name)[1]})
-
-        print 'del_url' + del_url
-        #Can also supply a thumbnail url
+        #Can also supply a thumbnail url, but I don't think we need to
 
         return jsonify(
             files=[dict(
-                name=data_file.filename,
+                name=sec_file,
                 size=os.stat(file_name).st_size,  # content_length usually 0
                 type=data_file.content_type,
-                delete_url=del_url,
+                delete_url=url_for('getfiles', dir_id=dir_id,
+                                   filename=sec_file),
                 delete_type="DELETE",
-                url="http://inv:5000/" + file_name)])
+                url=url_for('getfiles', dir_id=dir_id, filename=sec_file))])
 
 
-@app.route('/upload', methods=['POST'])
-def upload():
-    form = OtherForm()
-    print 'files' + request.form['files']
-    fil = request.files['file']
+#Handle getting and deleting of files
+@app.route('/files/<dir_id>/<filename>', methods=['GET', 'DELETE'])
+def getfiles(dir_id, filename):
+    if request.method == 'GET':
 
-    if fil:
-        filename = uuid.uuid4()  # this should be returned to user in finalise
-        fil.save(os.path.join(app.config['UPLOAD_FOLDER'], str(filename)))
+        return send_from_directory(app.config['UPLOAD_FOLDER'] + "/" + dir_id,
+                                   urllib2.unquote(filename))
 
-    return render_template(
-        'upload.html',
-        domain=request.form['domain'],
-        fileret=request.form['files'],
-        form=form)
+    if request.method == 'DELETE':
+
+        file_dir = app.config['UPLOAD_FOLDER'] + "/" + dir_id
+        try:
+            os.remove(file_dir + "/" + urllib2.unquote(filename))
+            if not os.listdir(file_dir):
+                os.rmdir(file_dir)
+        except OSError as ex:
+            flash("Caught Server Error: " + ex.strerror)
+
+        return ""
 
 
 @app.route('/finalise', methods=['POST'])

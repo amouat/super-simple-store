@@ -32,6 +32,12 @@ $(function () {
         )
     );
 
+    $('#fileupload').fileupload(
+        'option',
+        'dropZone',
+        $(drop_zone)
+    );
+
     if (window.location.hostname === 'blueimp.github.com') {
         // Demo settings:
         $('#fileupload').fileupload('option', {
