@@ -1,55 +1,70 @@
 {% extends "ss-base.html" %}
 {% set active_page = "deposit" %}
 
+{% block style %}
+{{ super() }}
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fileupload-ui.css') }}">
+  <!-- CSS adjustments for browsers with JavaScript disabled -->
+  <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fileupload-ui-noscript.css') }}"></noscript>
+  <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+{% endblock %}
+
 {% block body_content %}
+
 {{ super() }}
 
     <div class="container">
-      <form method="post" action="upload">
-        <input type="hidden" id="fileselec" name="files" value="">
+
       <!-- Main hero unit for a primary marketing message or call to action -->
-      <div class="hero-unit">
+      <div class="row deposit">
         <h1>Deposit</h1>
 
-        <p/>
-        <div id="drop_zone"><h2>Drop files here</h2></div>
+        <div id="drop_zone">
+          <!--<h2>or <span class="btn btn-file">Upload<input type="file" /></span></h2>-->
+          <!--<div class="fileupload fileupload-new" data-provides="fileupload">
+            <span class="btn btn-file"><span class="fileupload-new">Select file</span><span class="fileupload-exists">Change</span><input type="file" name="file"/></span>
+            <span class="fileupload-preview"></span>
+            <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none">×</a>
+          </div>-->
+   <!-- The file upload form used as target for the file upload widget -->
+   <form id="fileupload" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+        <!-- Redirect browsers with JavaScript disabled to the origin page -->
+        <noscript>JavaScript is required to upload files.</noscript>
+        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+            <h2>Use the button or drag and drop files to deposit</h2>
+        <div class="span5 add-button">
+                <!-- The fileinput-button span is used to style the file input field as button -->
+                <span class="btn btn-large fileinput-button add-button">
+                    <i class="icon-plus icon-white"></i>
+                    <span>Add files...</span>
+                    <input type="file" name="files[]" multiple>
+                </span>
+            <!-- The global progress information -->
+            <div class="span5 fileupload-progress fade">
+                <!-- The global progress bar -->
+                <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                    <div class="bar" style="width:0%;"></div>
+                </div>
+                <!-- The extended global progress information -->
+                <div class="progress-extended">&nbsp;</div>
+            </div>
+        </div>
+        <!-- The loading indicator is shown during file processing -->
+        <div class="fileupload-loading"></div>
+        <br>
+        <!-- The table listing the files available for upload/download -->
+        <table role="presentation" class="table" id="sss-file-table"><tbody class="files"></tbody></table>
+    </form>
+        </div>
         <output id="list"></output>
 
-        <script>
-          function handleFileSelect(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-
-            var files = evt.dataTransfer.files; // FileList object.
-
-            // files is a FileList of File objects. List some properties.
-            var output = [];
-            for (var i = 0, f; f = files[i]; i++) {
-              output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-              f.size, ' bytes, last modified: ',
-              f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-              '</li>');
-            }
-            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-            document.getElementById('fileselec').value = JSON.stringify(files);
-          }
-
-          function handleDragOver(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-            evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-          }
-
-          // Setup the dnd listeners.
-          var dropZone = document.getElementById('drop_zone');
-          dropZone.addEventListener('dragover', handleDragOver, false);
-          dropZone.addEventListener('drop', handleFileSelect, false);
-        </script>
       </div>
-      <div class="domains" id="domains" width="100%">
+      <form method="post" action="{{ url_for('addmeta') }}" enctype="multipart/form-data">
+        <div class="row" id="domains">
 
 
-        <h2>Select a domain</h2>
+          <h1>Select a domain</h1>
 
         <!-- id/value, text, icon -->
   {% set domain_entries = [
@@ -66,7 +81,7 @@
 
 
   {% for id, text, icon in domain_entries %}
-  <div class="in {% if id == default_domain %} highlight-icon{% endif %}">
+  <div class="domain {% if id == default_domain %} highlight-icon{% endif %}">
     <input type="radio" class="visuallyhidden" name="domain" id="{{ id }}" value="{{ id }}" 
     {% if id == default_domain %}checked="checked"{% endif %}/>
     <label for="{{ id }}">
@@ -76,19 +91,99 @@
   </div>
   {% endfor %}
 
-     <input class="btn btn-primary btn-large pull-right" type="submit"/>
+
+      <div class="dep-submit span9 pull-left">
+        <input class="btn btn-primary btn-large" type="submit" value="Submit"></input>
+      </div>
 
       </div>
-        </form>
-      </div>
+    </form>
+  </div>
 {% endblock %}
 {% block scripts %}
 {{ super() }}
-
   <script>
     $('#domains input:radio').addClass('visuallyhidden');
-    $('#domains .in').click(function() {
+    $('#domains .domain').click(function() {
       $(this).addClass('highlight-icon').siblings().removeClass('highlight-icon');
       });
   </script>
+{% raw %}
+<!-- The template to display files available for upload -->
+<script id="template-upload" type="text/x-tmpl">
+{% for (var i=0, file; file=o.files[i]; i++) { %}
+    <tr class="template-upload fade amtest">
+        <td class="preview"><span class="fade"></span></td>
+        <td class="name"><span>{%=file.name%}</span></td>
+        <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+        {% if (file.error) { %}
+            <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+        {% } else if (o.files.valid && !i) { %}
+            <td>
+                <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar" style="width:0%;"></div></div>
+            </td>
+            <td>{% if (!o.options.autoUpload) { %}
+                <button class="btn btn-primary start">
+                    <i class="icon-upload icon-white"></i>
+                    <span>Start</span>
+                </button>
+            {% } %}</td>
+        {% } else { %}
+            <td colspan="2"></td>
+        {% } %}
+        <td>{% if (!i) { %}
+            <button class="btn btn-warning cancel">
+                <i class="icon-ban-circle icon-white"></i>
+                <span>Cancel</span>
+            </button>
+        {% } %}</td>
+    </tr>
+{% } %}
+</script>
+<!-- The template to display files available for download -->
+<script id="template-download" type="text/x-tmpl">
+{% for (var i=0, file; file=o.files[i]; i++) { %}
+    <tr class="template-download fade">
+        {% if (file.error) { %}
+            <td></td>
+            <td class="name"><span>{%=file.name%}</span></td>
+            <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+            <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+        {% } else { %}
+            <td class="preview">{% if (file.thumbnail_url) { %}
+                <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="gallery" download="{%=file.name%}"><img src="{%=file.thumbnail_url%}"></a>
+            {% } %}</td>
+            <td class="name">
+                <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">{%=file.name%}</a>
+            </td>
+            <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+            <td colspan="2"></td>
+        {% } %}
+        <td>
+            <button class="btn btn-danger delete" data-type="{%=file.delete_type%}" data-url="{%=file.delete_url%}"{% if (file.delete_with_credentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
+                <i class="icon-trash icon-white"></i>
+                <span>Delete</span>
+            </button>
+            <input type="checkbox" name="delete" value="1" class="toggle">
+        </td>
+    </tr>
+{% } %}
+{% endraw %}
+</script>
+<!--<script src="{{ url_for('static', filename='js/vendor/jquery.ui.widget.js') }}"></script>-->
+<script src="{{ url_for('static', filename='js/vendor/jquery.ui.widget.js') }}"></script>
+<!-- Java templating crap - should try to kill this -->
+<script src="{{ url_for('static', filename='js/tmpl.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.iframe-transport.js') }}"></script>
+<!-- The basic File Upload plugin -->
+<script src="{{ url_for('static', filename='js/jquery.fileupload.js') }}"></script>
+<!-- The File Upload file processing plugin -->
+<script src="{{ url_for('static', filename='js/jquery.fileupload-fp.js') }}"></script>
+<!-- The File Upload user interface plugin -->
+<script src="{{ url_for('static', filename='js/jquery.fileupload-ui.js') }}"></script>
+<!-- The main application script -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<!-- The XDomainRequest Transport is included for cross-domain file deletion for IE8+ -->
+<!--[if gte IE 8]><script src="{{ url_for('static', filename='js/cors/jquery.xdr-transport.js') }}"></script><![endif]-->
+
 {% endblock %}

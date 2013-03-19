@@ -6,4 +6,5 @@ tags
 .ropeproject
 *.egg-info
 venv/
+sss/uploads/
 *.swp

@@ -2,7 +2,7 @@
 {% import "bootstrap_wtf.html" as wtf %}
 {% block style %}
   {{ super() }}
-  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='ss-style.css') }}">
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/ss-style.css') }}">
 
 {% endblock %}
 {% block body_content %}
@@ -22,7 +22,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">SuperSimpleStore</a>
+          <a class="brand" href="/">SuperSimpleStore</a>
           <div class="nav-collapse">
             <ul class="nav">
               {% for href, id, caption in nav_bar_items %}
@@ -37,7 +37,7 @@
 
 {% endblock %}
 
-{# Really just want to rename block, assume this the way... #}
+{# Really just want to rename block, assume this is the way... #}
 {% block bootstrap_js_bottom %}
   {{ super() }}
   {% block scripts %}
