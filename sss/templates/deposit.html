@@ -61,6 +61,7 @@
 
       </div>
       <form method="post" action="{{ url_for('addmeta') }}" enctype="multipart/form-data">
+        <input type="hidden" id="filelist" name="filelist" value=""></input>
         <div class="row" id="domains">
 
 
@@ -93,7 +94,7 @@
 
 
       <div class="dep-submit span9 pull-left">
-        <input class="btn btn-primary btn-large" type="submit" value="Submit"></input>
+        <button class="btn btn-primary btn-large" id="submit-deposit">Submit Deposit</button>
       </div>
 
       </div>
@@ -153,7 +154,7 @@
             <td class="preview">{% if (file.thumbnail_url) { %}
                 <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="gallery" download="{%=file.name%}"><img src="{%=file.thumbnail_url%}"></a>
             {% } %}</td>
-            <td class="name">
+            <td class="name uploaded">
                 <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">{%=file.name%}</a>
             </td>
             <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
@@ -170,7 +171,7 @@
 {% } %}
 {% endraw %}
 </script>
-<!--<script src="{{ url_for('static', filename='js/vendor/jquery.ui.widget.js') }}"></script>-->
+<script src="{{ url_for('static', filename='js/deposit.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/jquery.ui.widget.js') }}"></script>
 <!-- Java templating crap - should try to kill this -->
 <script src="{{ url_for('static', filename='js/tmpl.min.js') }}"></script>

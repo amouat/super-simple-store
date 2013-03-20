@@ -36,14 +36,11 @@ class OtherForm(Form):
 def addmeta():
     print 'here'
     form = OtherForm()
-    print 'here2'
 
     return render_template(
         'addmeta.html',
-        #domain=request.form['domain'],
-        domain='Other',
-        fileret='{}',
-        #fileret=request.form['files'],
+        domain=request.form['domain'],
+        fileret=request.form.get('filelist'),
         form=form)
 
 

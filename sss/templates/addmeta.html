@@ -5,18 +5,32 @@
 {{ super() }}
 
     <div class="container">
-      <!-- Main hero unit for a primary marketing message or call to action -->
-      <div class="hero-unit">
-        <h1>Give me some metadata love:</h1>
+      <div class="meta-container row">
+        <h1>Your Deposit</h1>
 
-        <div id="files">
-          <h2>Files</h2>
+        <div class="span2">
+          <h2>Files:</h2>
+        </div>
+
+        <div class="span8">
+          <table id="filetable" class="table table-bordered">
+          </table>
         </div>
         
-        <input type="hidden" id="filelist" name="files" value="{{ fileret }}"/>
-        {{ wtf.quick_form(form, action="finalise", buttons=[('submit', 'primary', 'Deposit')]) }}
-        
+        <div id="domain" class="span2">
+          <h2>Domain:</h2> 
+        </div>
+        <div class="span8">{{ domain }}</div>
+
+
+        <div id="meta" class="span10">
+          <h2>Please add some more metadata:</h2>
+
+          <input type="hidden" id="filelist" name="files" value="{{ fileret }}"/>
+          {{ wtf.quick_form(form, action="finalise", buttons=[('submit', 'primary', 'Deposit')]) }}
+        </div>
       </div>
+        
 
     </div>
 
@@ -24,11 +38,5 @@
 
 {% block scripts %}
   {{ super() }}
-  <script>
-    json = $.parseJSON($("#filelist").attr("value"));
-    filediv = $("#files");
-    $.each(json, function(index, file) {
-      filediv.append("<p>" + file.name + "</p>");
-    });
-  </script>
+  <script src="{{ url_for('static', filename='js/addmeta.js') }}"></script>
 {% endblock %}
