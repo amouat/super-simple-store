@@ -20,7 +20,9 @@ $(function () {
         // Uncomment the following to send cross-domain cookies:
         //xhrFields: {withCredentials: true},
         url: '/upload'
+        dropZone: $("#drop_zone") //Don't know why this doesn't work
     });
+
 
     // Enable iframe cross-domain access via redirect option:
     $('#fileupload').fileupload(
@@ -30,12 +32,6 @@ $(function () {
             /\/[^\/]*$/,
             '/cors/result.html?%s'
         )
-    );
-
-    $('#fileupload').fileupload(
-        'option',
-        'dropZone',
-        $(drop_zone)
     );
 
     if (window.location.hostname === 'blueimp.github.com') {
