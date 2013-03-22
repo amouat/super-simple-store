@@ -94,7 +94,50 @@ html {
           border-radius: 6px
 }
 
+
+.meta-label {
+
+  font-size: 17.5px;
+  font-weight: bold;
+  text-align: right;
+  width: 160px;
+  float: left;
+  padding-right: 6px;
+  padding-top: 5px;
+  margin-right: 35px; /* don't understand why margin right is needed :( */
+
+}
+
+#meta-fields {
+  margin-top: 40px;
+  text-align: left;
+}
+
 .meta-container h1 {
 
   text-align: center;
+  margin-bottom: 40px;
+}
+
+.metacontent {
+  margin-top: 10px;
+  line-height: 40px;
+}
+
+#meta{
+  margin-top: 40px;
+  text-align: center;
+}
+
+.meta-table {
+
+  background-color: #f5f5f5;
+}
+
+.first-cap {
+  text-transform: capitalize;
+}
+
+#adv-fields {
+  margin-top: 20px;
 }
