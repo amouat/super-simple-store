@@ -12,6 +12,7 @@ from flask import (Flask, request, render_template, jsonify, flash,
 from werkzeug import secure_filename
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form, TextField
+from flask.ext.wtf.html5 import EmailField
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -30,20 +31,29 @@ def home():
 class OtherForm(Form):
     author = TextField('Author')
     title = TextField('Title')
+    keywords = TextField('Keywords')
+    pub = TextField('Publication')
+    email = EmailField('Email')
+
+    #using generator allows us to order output and avoid csrf field
+    def basic_field_iter(self):
+        for f in [self.author, self.title, self.keywords]:
+            yield f
+
+    def adv_field_iter(self):
+        yield self.pub
+        yield self.email
 
 
 @app.route('/addmeta', methods=['POST'])
 def addmeta():
     print 'here'
     form = OtherForm()
-    print 'here2'
 
     return render_template(
         'addmeta.html',
-        #domain=request.form['domain'],
-        domain='Other',
-        fileret='{}',
-        #fileret=request.form['files'],
+        domain=request.form['domain'],
+        fileret=request.form.get('filelist'),
         form=form)
 
 
