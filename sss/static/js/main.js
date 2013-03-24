@@ -19,8 +19,8 @@ $(function () {
     $('#fileupload').fileupload({
         // Uncomment the following to send cross-domain cookies:
         //xhrFields: {withCredentials: true},
-        url: '/upload'
-        dropZone: $("#drop_zone") //Don't know why this doesn't work
+        url: '/upload',
+        dropZone: $("#drop_zone")
     });
 
 
