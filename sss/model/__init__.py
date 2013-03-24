@@ -1,3 +1,3 @@
-from model import Submission
+from model import Submission, SubmissionMetadata, LinguisticsMetadata
 
-__all__ = ['Submission']
+__all__ = ['Submission', 'SubmissionMetadata', 'LinguisticsMetadata']
