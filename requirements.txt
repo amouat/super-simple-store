@@ -5,3 +5,5 @@ Flask-WTF==0.8.2
 SQLAlchemy==0.7.9
 argparse==1.2.1
 Babel==0.9.6
+Flask-Testing==0.4
+nose==1.2.1

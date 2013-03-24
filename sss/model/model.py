@@ -1,4 +1,4 @@
-import datetime
+from uuid import uuid4
 
 from ext import db
 
@@ -8,8 +8,13 @@ import babel
 class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(db.UUID, unique=True, nullable=False)
+    content = db.Column(db.LargeBinary())
     # metadata name is reserved, so using md
     md = db.relationship('SubmissionMetadata', backref='submission', uselist=False)
+
+    def __init__(self, uuid=None, content=None):
+        self.uuid = uuid if uuid is not None else uuid4()
+        self.content = content
 
     def __repr__(self):
         return '<Submission %s>' % self.uuid
@@ -19,6 +24,7 @@ class SubmissionMetadata(db.Model):
     """DataCite-based metadata class. Format description is here:
     http://schema.datacite.org/meta/kernel-2.2/doc/DataCite-MetadataKernel_v2.2.pdf
     """
+    __tablename__ = 'submission_metadata'
     submission_id = db.Column(db.Integer, db.ForeignKey('submission.id'))
 
     # mandatory
@@ -47,15 +53,15 @@ class SubmissionMetadata(db.Model):
     # last_metadata_update = hook?
     # metadata_version_number = schema migration version?
 
-    def __repr__(self):
-        return '<SubmissionMetadataDataCite %s>' % self.id
-
-    # using joined table inheritance for the 
+    # using joined table inheritance for the specific domains
     submission_type = db.Column(db.String(50))
     __mapper_args__ = {
-        'polymorphic_identity': 'submission_metadata',
+        'polymorphic_identity': 'generic',
         'polymorphic_on': submission_type
     }
+
+    def __repr__(self):
+        return '<SubmissionMetadata %s>' % self.id
 
 
 class LinguisticsMetadata(SubmissionMetadata):
@@ -66,3 +72,6 @@ class LinguisticsMetadata(SubmissionMetadata):
     __mapper_args__ = {
         'polymorphic_identity': 'linguistics',
     }
+
+    def __repr__(self):
+        return '<LinguisticsMetadata %s>' % self.id
