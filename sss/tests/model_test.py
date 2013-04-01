@@ -29,5 +29,10 @@ class ModelTest(TestCase):
         submission = Submission(uuids, 'my content')
         db.session.add(submission)
         db.session.flush()
-        s = db.session.query(Submission).filter_by(ext_id=uuids).first()
+        s = db.session.query(Submission).filter_by(uuid=uuids).first()
         self.assertEquals(s, submission)
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()
