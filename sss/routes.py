@@ -3,33 +3,24 @@
 
 from __future__ import with_statement
 import uuid
-import logging
 import os
 import urllib2
+import datetime
 
-from flask import (Flask, request, render_template, jsonify, flash,
+from sss import app
+from flask import (request, render_template, jsonify, flash,
                    send_from_directory, url_for)
 from werkzeug import secure_filename
-from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form, TextField
 from flask.ext.wtf.html5 import EmailField
 from wtforms.ext.sqlalchemy.orm import model_form
-
-app = Flask(__name__)
-Bootstrap(app)
-
-#app.config.from_object(__name__)
-app.config['BOOTSTRAP_FONTAWESOME'] = True
-app.config['SECRET_KEY'] = 'wtfkey'
-app.config['UPLOAD_FOLDER'] = 'uploads'
-
-
-@app.route('/')
-def home():
-    return render_template('home.html')
+from sss import db
+from model.model import Submission, SubmissionMetadata
 
 
 class OtherForm(Form):
+    """To be replaced with code to automatically generate form based on
+    model."""
     author = TextField('Author')
     title = TextField('Title')
     keywords = TextField('Keywords')
@@ -46,24 +37,72 @@ class OtherForm(Form):
         yield self.email
 
 
+@app.route('/addtestdata')
+def addtestdata():
+    """For testing purposes only; creates a test DB entry. Should really be
+    a POST or PUT operation."""
+    sub = Submission(content='amtest')
+    meta = SubmissionMetadata("Creator", "title", "pub",
+                              datetime.date(2012, 2, 10))
+
+    sub.md = meta
+    db.session.add(sub)
+    db.session.commit()
+
+    return "Added " + sub.uuid
+
+
+@app.route('/gettestdata<uuidarg>')
+def gettestdata(uuidarg):
+    """Returns the submission with the given UUID."""
+
+    sub = Submission.query.filter_by(uuid=uuidarg).first()
+    ret = "Id: " + str(sub.id) + "<br/>"
+    if sub.md is not None:
+        ret += "Title: " + str(sub.md.title)
+
+    return ret
+
+
+@app.route('/listall')
+def listall():
+    """Lists all test data."""
+
+    ret = ""
+    for sub in db.session.query(Submission).order_by(Submission.id):
+        ret += "&nbsp;&nbsp;" + str(sub.uuid) + "<br/>"
+
+    return "Got: <br/>" + ret
+
+
 @app.route('/testmeta')
 def testmeta():
-    SubForm = model_form(Submission, Form)
-    uuids = uuid.uuid4()
-    sub = Submission(uuids, 'amtest')
-    f = OtherForm()
-    form = SubForm(f, sub)
+    """Creates a new submission form using model_form and returns it"""
+    """WIP"""
+    SubForm = model_form(Submission, base_class=Form, exclude=['md'])
+    sub = Submission()
+    meta = SubmissionMetadata()
+    sub.md = meta
+    base_form = SubForm(request.form, sub)
+    meta_form = model_form(SubmissionMetadata, base_class=Form,
+                           exclude=['submission'])
 
     return render_template(
         'testmeta.html',
         domain="Linguistics",
         fileret="[]",
-        form=form)
+        base_form=base_form,
+        meta_form=meta_form)
+
+
+@app.route('/')
+def home():
+    return render_template('home.html')
 
 
 @app.route('/addmeta', methods=['POST'])
 def addmeta():
-    print 'here'
+    """Form for adding metadata."""
     form = OtherForm()
 
     return render_template(
@@ -75,6 +114,7 @@ def addmeta():
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
+    """Handle file uploads. Called from code, not directly by user."""
     if request.method == 'GET':
 
         #Possibly not correct, but trying to mimic requests on working code
@@ -111,9 +151,9 @@ def upload():
                 url=url_for('getfiles', dir_id=dir_id, filename=sec_file))])
 
 
-#Handle getting and deleting of files
 @app.route('/files/<dir_id>/<filename>', methods=['GET', 'DELETE'])
 def getfiles(dir_id, filename):
+    """Handle getting and deleting of files."""
     if request.method == 'GET':
 
         return send_from_directory(app.config['UPLOAD_FOLDER'] + "/" + dir_id,
@@ -134,25 +174,11 @@ def getfiles(dir_id, filename):
 
 @app.route('/finalise', methods=['POST'])
 def finalise():
+    """Completes deposit and returns UUID."""
+    """Just a placeholder currently."""
     return render_template('finalise.html', tag=uuid.uuid4())
 
 
 @app.route('/deposit')
 def deposit():
     return render_template('deposit.html')
-
-
-if __name__ == '__main__':
-    from optparse import OptionParser
-    parser = OptionParser()
-    parser.add_option('-d', '--debug', dest='debug',
-                      help='Run app in debug mode', action='store_true', default=False)
-
-    (options, args) = parser.parse_args()
-
-    if options.debug:
-        print ' * Setting debug mode'
-        app.config['DEBUG'] = True
-        app.logger.setLevel(logging.ERROR)
-
-    app.run(host='0.0.0.0')

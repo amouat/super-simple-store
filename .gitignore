@@ -8,3 +8,6 @@ tags
 venv/
 sss/uploads/
 *.swp
+*.sqlite
+*.pyc
+*.db
