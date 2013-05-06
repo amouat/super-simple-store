@@ -28,7 +28,7 @@ class SubmissionMetadata(db.Model):
     __tablename__ = 'submission_metadata'
     submission_id = db.Column(db.Integer, db.ForeignKey('submission.id'))
 
-    # mandatory
+    # id seems to be needed to maintain link to parent submission
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.String(128))
     title = db.Column(db.String(256))
@@ -36,8 +36,9 @@ class SubmissionMetadata(db.Model):
     publication_year = db.Column(db.Date())
 
     def basicFieldIter(self):
-        for f in [self.id, self.creator, self.title, self.publisher,
-                  self.publication_year]:
+        #why won't submission_id work?
+        for f in ['creator', 'title', 'publisher',
+                  'publication_year']:
             yield f
 
     # optional
@@ -55,10 +56,10 @@ class SubmissionMetadata(db.Model):
     description = db.Column(db.String(1024))
 
     def optionalFieldIter(self):
-        for f in [self.subject, self.contributor, self.date, self.language,
-                  self.resource_type, self.alternate_identifier,
-                  self.related_identifier, self.size, self.format,
-                  self.version, self.rights, self.description]:
+        for f in ['subject', 'contributor', 'date', 'language',
+                  'resource_type', 'alternate_identifier',
+                  'related_identifier', 'size', 'format',
+                  'version', 'rights', 'description']:
             yield f
 
     # administrative metadata
@@ -84,13 +85,15 @@ class SubmissionMetadata(db.Model):
 
 
 class LinguisticsMetadata(SubmissionMetadata):
-    id = db.Column(db.Integer, db.ForeignKey('submission_metadata.id'), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey('submission_metadata.id'),
+                   primary_key=True)
 
     phrase_popularity = db.Column(db.String(256))  # a stub field
 
     def basicFieldIter(self):
-        SubmissionMetadata.basicFieldIter()
-        yield self.phrase_popularity
+        for s in SubmissionMetadata.basicFieldIter(self):
+            yield s
+        yield 'phrase_popularity'
 
     __mapper_args__ = {
         'polymorphic_identity': 'linguistics',
@@ -98,3 +101,7 @@ class LinguisticsMetadata(SubmissionMetadata):
 
     def __repr__(self):
         return '<LinguisticsMetadata %s>' % self.id
+
+    def __init__(self, phrase_popularity=""):
+        SubmissionMetadata.__init__(self)  # need to add args
+        self.phrase_popularity = phrase_popularity
