@@ -11,35 +11,11 @@ from sss import app
 from flask import (request, render_template, jsonify, flash,
                    send_from_directory, url_for)
 from werkzeug import secure_filename
-from flask.ext.wtf import Form, TextField, IntegerField
-import flask.ext.wtf.html5
+from flask.ext.wtf import Form
 from wtforms.ext.sqlalchemy.orm import model_form
 from sss import db
 from model.model import Submission, SubmissionMetadata, LinguisticsMetadata
 from model.HTML5ModelConverter import HTML5ModelConverter
-
-
-class OtherForm(Form):
-    """To be replaced with code to automatically generate form based on
-    model."""
-    author = TextField('Author')
-    title = TextField('Title')
-    keywords = TextField('Keywords')
-    pub = TextField('Publication')
-    email = flask.ext.wtf.html5.EmailField('Email')
-    version = flask.ext.wtf.html5.IntegerField('Version')
-    version_old = IntegerField('VersionOld')
-
-    #using generator allows us to order output and avoid csrf field
-    def basic_field_iter(self):
-        for f in [self.author, self.title, self.keywords]:
-            yield f
-
-    def adv_field_iter(self):
-        yield self.pub
-        yield self.email
-        yield self.version
-        yield self.version_old
 
 
 @app.route('/addtestdata')
@@ -80,47 +56,6 @@ def listall():
     return "Got: <br/>" + ret
 
 
-@app.route('/testmeta', methods=['GET', 'POST'])
-def testmeta():
-    """Creates a new submission form using model_form and returns it"""
-    """WIP"""
-
-    #create form for submission md and linguistics md
-    #ignore submission for minute
-
-    #SubForm = model_form(Submission, base_class=Form, exclude=['md'])
-    if request.method == 'GET':
-        sub = Submission()
-        meta = LinguisticsMetadata()
-        sub.md = meta
-        db.session.add(sub)
-        db.session.commit()
-        #base_form = SubForm(request.form, sub)
-    else:
-        sub = Submission.query.filter_by(uuid=request.form['uuid']).first()
-        if sub is None:
-            return "Failed to find sub uuid"
-
-    MetaForm = model_form(LinguisticsMetadata, base_class=Form,
-                          exclude=['submission', 'submission_type'],
-                          converter=HTML5ModelConverter())
-    meta_form = MetaForm(request.form, sub.md)
-
-    if meta_form.validate_on_submit():
-        #should point to finalize
-        return "SUCCESS"
-
-    return render_template(
-        'testmeta.html',
-        domain="Linguistics",
-        fileret="[]",
-        form=meta_form,
-        uuid=sub.uuid,
-        basic_field_iter=sub.md.basicFieldIter,
-        opt_field_iter=sub.md.optionalFieldIter,
-        getattr=getattr)
-
-
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -129,13 +64,42 @@ def home():
 @app.route('/addmeta', methods=['POST'])
 def addmeta():
     """Form for adding metadata."""
-    form = OtherForm()
+
+    if 'uuid' in request.form:
+        sub = Submission.query.filter_by(uuid=request.form['uuid']).first()
+        if sub is None:
+            return "ERROR: Failed to find submission uuid"
+    else:
+        sub = Submission()
+
+        if request.form['domain'] == 'linguistics':
+            meta = LinguisticsMetadata()
+        else:
+            meta = SubmissionMetadata()
+
+        sub.md = meta
+        db.session.add(sub)
+        db.session.commit()
+
+    MetaForm = model_form(sub.md.__class__, base_class=Form,
+                          exclude=['submission', 'submission_type'],
+                          converter=HTML5ModelConverter())
+    meta_form = MetaForm(request.form, sub.md)
+
+    if meta_form.validate_on_submit():
+        return render_template('finalise.html', tag=sub.uuid)
+    #else:
+    #   print meta_form.errors
 
     return render_template(
         'addmeta.html',
         domain=request.form['domain'],
         fileret=request.form.get('filelist'),
-        form=form)
+        form=meta_form,
+        uuid=sub.uuid,
+        basic_field_iter=sub.md.basicFieldIter,
+        opt_field_iter=sub.md.optionalFieldIter,
+        getattr=getattr)
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -196,13 +160,6 @@ def getfiles(dir_id, filename):
             flash("Caught Server Error: " + ex.strerror)
 
         return ""
-
-
-@app.route('/finalise', methods=['POST'])
-def finalise():
-    """Completes deposit and returns UUID."""
-    """Just a placeholder currently."""
-    return render_template('finalise.html', tag=uuid.uuid4())
 
 
 @app.route('/deposit')

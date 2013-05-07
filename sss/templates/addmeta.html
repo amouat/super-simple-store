@@ -22,9 +22,10 @@
           <h2>Add some basic details</h2>
 
           <div id="meta-fields">
-            <form class="form form-horizontal meta-form" method="post" action="finalise">
+            <form class="form form-horizontal meta-form" method="post" action="addmeta">
               <input type="hidden" id="filelist" name="files" value="{{ fileret }}"/>
-              <!-- wtf.quick_form(form, action="finalise", buttons=[('submit', 'primary btn-large', 'Deposit')]) -->
+              <input type="hidden" id="uuid" name="uuid" value="{{ uuid }}"/>
+              {{ form.csrf_token }}
 
               {# would have been easier if wtf bs let me pass in css classes to horizontal_field #}
               {%- macro meta_field(f) %}
@@ -44,18 +45,17 @@
               </div>
               {% endmacro %}
 
-              {% for f in form.basic_field_iter() %}
-                {{ meta_field(f) }}
+              {% for f in basic_field_iter() %}
+                {{ meta_field(getattr(form, f)) }}
               {% endfor %}
-
               <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#adv-fields">
                 Add more details…
               </button>
  
               <div id="adv-fields" class="collapse"> 
 
-              {% for f in form.adv_field_iter() %}
-                {{ meta_field(f) }}
+              {% for f in opt_field_iter() %}
+                {{ meta_field(getattr(form, f)) }}
               {% endfor %}
               </div>
 
